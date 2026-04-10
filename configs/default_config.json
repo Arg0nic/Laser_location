@@ -1,0 +1,22 @@
+{
+  "L_min": 0.0,
+  "L_max": 800.0,
+  "dL": 10.0,
+  "N": 2000,
+  "M": 8,
+  "theta_0": 0.0001,
+  "d_target": 0.5,
+  "eta_min": 0.15,
+  "A0": 1.0,
+  "b": 0.0,
+  "sigma_A": 0.05,
+  "T": 0.25,
+  "alpha": 0.35,
+  "sigma_w_mode": "linear",
+  "sigma_w_value": 0.01,
+  "sigma_w_slope": 0.00008,
+  "p_required": 0.95,
+  "random_seed": 20260409,
+  "use_initial_diameter": false,
+  "d0": 0.01
+}

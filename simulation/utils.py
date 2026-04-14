@@ -8,7 +8,6 @@ from typing import Any, Iterable, Mapping
 
 
 def create_run_output_dir(root: Path) -> Path:
-    """Create a timestamped output directory without overwriting prior runs."""
     root.mkdir(parents=True, exist_ok=True)
     run_name = datetime.now().strftime("run_%Y%m%d_%H%M%S")
     destination = make_unique_path(root / run_name)
@@ -17,7 +16,6 @@ def create_run_output_dir(root: Path) -> Path:
 
 
 def make_unique_path(path: Path) -> Path:
-    """Return a non-existing path by appending a numeric suffix when needed."""
     if not path.exists():
         return path
 
@@ -33,7 +31,6 @@ def make_unique_path(path: Path) -> Path:
 
 
 def write_csv_rows(path: Path, rows: Iterable[Mapping[str, Any]]) -> None:
-    """Write rows to CSV using the mapping keys from the first row as columns."""
     materialized_rows = list(rows)
     if not materialized_rows:
         raise ValueError("Cannot write an empty CSV file.")
@@ -45,14 +42,12 @@ def write_csv_rows(path: Path, rows: Iterable[Mapping[str, Any]]) -> None:
 
 
 def save_json(path: Path, payload: Mapping[str, Any]) -> None:
-    """Save JSON with stable indentation."""
     with path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, ensure_ascii=False)
         handle.write("\n")
 
 
 def format_optional_distance(value: float | None) -> str:
-    """Format an optional distance for console summaries."""
     if value is None:
         return "not found on the current grid"
     return f"{value:.3f} m"

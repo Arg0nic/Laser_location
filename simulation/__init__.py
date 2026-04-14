@@ -1,5 +1,3 @@
-"""Core simulation package for the laser rangefinder model."""
-
 from .config import SimulationConfig
 from .runner import SimulationResults, export_results, run_simulation
 

@@ -45,18 +45,17 @@ class SignalModelTests(unittest.TestCase):
 
 
 class MonteCarloTests(unittest.TestCase):
-    def test_sigma_w_at_distance_supports_constant_and_linear_modes(self) -> None:
-        constant_config = SimulationConfig(sigma_w_mode="constant", sigma_w_value=0.25)
-        linear_config = SimulationConfig(sigma_w_mode="linear", sigma_w_value=0.1, sigma_w_slope=0.01)
+    def test_sigma_w_at_distance_uses_linear_model(self) -> None:
+        config = SimulationConfig(sigma_w_value=0.1, sigma_w_slope=0.01)
 
-        constant_value = sigma_w_at_distance(50.0, constant_config)
-        linear_values = sigma_w_at_distance(np.array([0.0, 10.0, 20.0]), linear_config)
+        scalar_value = sigma_w_at_distance(50.0, config)
+        linear_values = sigma_w_at_distance(np.array([0.0, 10.0, 20.0]), config)
 
-        self.assertAlmostEqual(constant_value, 0.25)
+        self.assertAlmostEqual(scalar_value, 0.6)
         assert_allclose(linear_values, np.array([0.1, 0.2, 0.3]))
 
     def test_sigma_w_at_distance_clamps_negative_linear_values_to_zero(self) -> None:
-        config = SimulationConfig(sigma_w_mode="linear", sigma_w_value=0.1, sigma_w_slope=-0.01)
+        config = SimulationConfig(sigma_w_value=0.1, sigma_w_slope=-0.01)
 
         values = sigma_w_at_distance(np.array([0.0, 20.0]), config)
 
@@ -80,8 +79,8 @@ class MonteCarloTests(unittest.TestCase):
         config = SimulationConfig(
             N=20,
             M=4,
-            sigma_w_mode="constant",
             sigma_w_value=0.0,
+            sigma_w_slope=0.0,
             eta_min=0.5,
             A0=1.0,
             b=0.0,
@@ -104,8 +103,8 @@ class MonteCarloTests(unittest.TestCase):
         config = SimulationConfig(
             N=20,
             M=4,
-            sigma_w_mode="constant",
             sigma_w_value=0.0,
+            sigma_w_slope=0.0,
             eta_min=0.1,
             A0=1.0,
             b=0.0,

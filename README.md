@@ -18,7 +18,6 @@
 - `k = floor(L / 200)`
 - `theta(L) = theta_0 * 3^k`
 - базовая модель пятна: `d(L) = theta(L) * L`
-- опциональный расширенный режим: `d(L) = sqrt(d0^2 + (theta(L) * L)^2)`
 - `R_s(L) = d(L) / 2`
 
 Правило принятия решения:
@@ -36,9 +35,8 @@
 1. Блуждание луча
    - генерируются `X, Y ~ Normal(0, sigma_w(L)^2)`
    - вычисляется смещение `r = sqrt(X^2 + Y^2)`
-   - поддерживаются режимы блуждания:
-     - `constant`
-     - `linear`, где `sigma_w(L) = sigma_w_value + sigma_w_slope * L`
+   - в проекте используется линейная модель блуждания:
+     `sigma_w(L) = sigma_w_value + sigma_w_slope * L`
 
 2. Доля энергии на цели
    - лазерное пятно и цель рассматриваются как круги
@@ -122,7 +120,7 @@ python main.py --config configs/default_config.json
 Пример с несколькими переопределениями параметров через CLI:
 
 ```bash
-python main.py --config configs/default_config.json --L-max 1000 --N 4000 --sigma-w-mode constant --sigma-w-value 0.03
+python main.py --config configs/default_config.json --L-max 1000 --N 4000 --sigma-w-value 0.03 --sigma-w-slope 0.0002
 ```
 
 Запуск без построения графиков:
@@ -146,13 +144,10 @@ python main.py --no-plots
 - `sigma_A`: среднеквадратичное отклонение шумовой добавки к амплитуде
 - `T`: финальный порог детектирования после EWMA
 - `alpha`: коэффициент EWMA
-- `sigma_w_mode`: режим блуждания луча, `constant` или `linear`
-- `sigma_w_value`: постоянное значение `sigma_w` или свободный член линейной модели
+- `sigma_w_value`: свободный член линейной модели `sigma_w`
 - `sigma_w_slope`: коэффициент наклона в линейной модели `sigma_w`
 - `p_required`: минимально допустимая вероятность успешной работы
 - `random_seed`: фиксированный seed для воспроизводимости
-- `use_initial_diameter`: включает расширенную формулу диаметра пятна
-- `d0`: начальный диаметр пучка для расширенной модели
 
 ## Какие файлы создаются
 

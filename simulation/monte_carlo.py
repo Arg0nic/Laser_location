@@ -10,16 +10,9 @@ from .signal_model import final_ewma_amplitudes
 
 
 def sigma_w_at_distance(distance: float | np.ndarray, config: SimulationConfig) -> float | np.ndarray:
-    """Return beam wander sigma for the selected mode."""
     distances = np.asarray(distance, dtype=float)
-
-    if config.sigma_w_mode == "constant":
-        values = np.full_like(distances, fill_value=config.sigma_w_value, dtype=float)
-    elif config.sigma_w_mode == "linear":
-        values = config.sigma_w_value + config.sigma_w_slope * distances
-        values = np.maximum(values, 0.0)
-    else:  # pragma: no cover - validated earlier
-        raise ValueError(f"Unsupported sigma_w_mode: {config.sigma_w_mode}")
+    values = config.sigma_w_value + config.sigma_w_slope * distances
+    values = np.maximum(values, 0.0)
 
     if np.isscalar(distance):
         return float(values)
@@ -31,7 +24,6 @@ def energy_fraction_on_target(
     target_radius: float,
     displacements: np.ndarray,
 ) -> np.ndarray:
-    """Compute the energy fraction eta for each beam-wander displacement."""
     if spot_radius < 0 or target_radius < 0:
         raise ValueError("Radii must be non-negative.")
 
@@ -57,7 +49,6 @@ def simulate_detection_probability(
     config: SimulationConfig,
     rng: np.random.Generator,
 ) -> float:
-    """Estimate p(L) for one geometrically valid distance."""
     sigma_w = sigma_w_at_distance(distance, config)
     x_samples = rng.normal(loc=0.0, scale=sigma_w, size=config.N)
     y_samples = rng.normal(loc=0.0, scale=sigma_w, size=config.N)

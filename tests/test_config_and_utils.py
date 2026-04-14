@@ -17,10 +17,9 @@ from simulation.utils import (
 
 
 class SimulationConfigTests(unittest.TestCase):
-    def test_from_mapping_normalizes_mode_and_exposes_target_radius(self) -> None:
-        config = SimulationConfig.from_mapping({"sigma_w_mode": "CONSTANT", "d_target": 0.5})
+    def test_from_mapping_exposes_target_radius(self) -> None:
+        config = SimulationConfig.from_mapping({"d_target": 0.5})
 
-        self.assertEqual(config.sigma_w_mode, "constant")
         self.assertAlmostEqual(config.target_radius, 0.25)
 
     def test_merge_applies_only_non_none_overrides(self) -> None:
@@ -34,7 +33,7 @@ class SimulationConfigTests(unittest.TestCase):
     def test_from_json_loads_values(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             config_path = Path(temp_dir) / "config.json"
-            payload = {"L_max": 123.0, "sigma_w_mode": "linear", "N": 10, "M": 2}
+            payload = {"L_max": 123.0, "N": 10, "M": 2}
             config_path.write_text(json.dumps(payload), encoding="utf-8")
 
             config = SimulationConfig.from_json(config_path)
@@ -42,6 +41,16 @@ class SimulationConfigTests(unittest.TestCase):
         self.assertEqual(config.L_max, 123.0)
         self.assertEqual(config.N, 10)
         self.assertEqual(config.M, 2)
+
+    def test_from_mapping_accepts_legacy_linear_sigma_mode(self) -> None:
+        config = SimulationConfig.from_mapping({"sigma_w_mode": "linear", "sigma_w_value": 0.2})
+
+        self.assertEqual(config.sigma_w_value, 0.2)
+
+    def test_from_mapping_allows_none_random_seed(self) -> None:
+        config = SimulationConfig.from_mapping({"random_seed": None})
+
+        self.assertIsNone(config.random_seed)
 
     def test_validate_rejects_invalid_parameters(self) -> None:
         invalid_payloads = [
@@ -52,10 +61,9 @@ class SimulationConfigTests(unittest.TestCase):
             {"d_target": 0.0},
             {"eta_min": 1.5},
             {"alpha": 0.0},
-            {"sigma_w_mode": "quadratic"},
+            {"sigma_w_mode": "constant"},
             {"sigma_w_value": -0.1},
             {"p_required": 1.5},
-            {"d0": -0.1},
         ]
 
         for payload in invalid_payloads:

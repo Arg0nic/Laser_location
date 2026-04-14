@@ -17,12 +17,10 @@ class GeometryTests(unittest.TestCase):
         self.assertAlmostEqual(scalar_value, 3.0e-4)
         assert_allclose(array_values, np.array([1.0e-4, 1.0e-4, 3.0e-4, 9.0e-4]))
 
-    def test_spot_diameter_supports_basic_and_advanced_models(self) -> None:
-        basic = spot_diameter(300.0, 1.0e-4)
-        advanced = spot_diameter(300.0, 1.0e-4, use_initial_diameter=True, d0=0.05)
+    def test_spot_diameter_uses_basic_model(self) -> None:
+        value = spot_diameter(300.0, 1.0e-4)
 
-        self.assertAlmostEqual(basic, 0.09)
-        self.assertAlmostEqual(advanced, math.sqrt(0.05**2 + 0.09**2))
+        self.assertAlmostEqual(value, 0.09)
 
     def test_circle_intersection_area_handles_no_overlap(self) -> None:
         self.assertEqual(circle_intersection_area(1.0, 1.0, 2.1), 0.0)

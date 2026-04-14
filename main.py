@@ -13,7 +13,6 @@ DEFAULT_CONFIG_PATH = Path("configs/default_config.json")
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Create the command-line interface."""
     parser = argparse.ArgumentParser(
         description=(
             "Simulate the maximum operating range of a UAV laser rangefinder "
@@ -44,22 +43,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Random seed for reproducibility.",
     )
     parser.add_argument(
-        "--sigma-w-mode",
-        dest="sigma_w_mode",
-        choices=["constant", "linear"],
-        help="Beam wander mode.",
-    )
-    parser.add_argument(
         "--sigma-w-value",
         dest="sigma_w_value",
         type=float,
-        help="Constant beam wander sigma or linear intercept in meters.",
+        help="Linear beam wander intercept in meters.",
     )
     parser.add_argument(
         "--sigma-w-slope",
         dest="sigma_w_slope",
         type=float,
-        help="Slope for linear beam wander mode in meters per meter.",
+        help="Slope for linear beam wander model in meters per meter.",
     )
     parser.add_argument(
         "--eta-min",
@@ -80,18 +73,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Required success probability for the operating range criterion.",
     )
     parser.add_argument(
-        "--use-initial-diameter",
-        dest="use_initial_diameter",
-        action=argparse.BooleanOptionalAction,
-        default=None,
-        help="Enable or disable the optional advanced spot-diameter model with d0.",
-    )
-    parser.add_argument(
-        "--d0",
-        type=float,
-        help="Initial beam diameter in meters for the optional advanced model.",
-    )
-    parser.add_argument(
         "--no-plots",
         action="store_true",
         help="Skip plot generation and only save CSV plus used_config.json.",
@@ -100,13 +81,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def load_config(config_path: Path, overrides: dict[str, Any]) -> SimulationConfig:
-    """Load config from JSON and apply CLI overrides."""
     config = SimulationConfig.from_json(config_path)
     return config.merge(overrides)
 
 
 def build_overrides(args: argparse.Namespace) -> dict[str, Any]:
-    """Collect CLI overrides while leaving unspecified values untouched."""
     keys = [
         "L_min",
         "L_max",
@@ -114,14 +93,11 @@ def build_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "N",
         "M",
         "random_seed",
-        "sigma_w_mode",
         "sigma_w_value",
         "sigma_w_slope",
         "eta_min",
         "T",
         "p_required",
-        "use_initial_diameter",
-        "d0",
     ]
     return {key: getattr(args, key) for key in keys}
 
@@ -133,22 +109,13 @@ def print_summary(
     artifacts: dict[str, Path],
     result: SimulationResults,
 ) -> None:
-    """Print a concise simulation summary."""
-    spot_model = "advanced sqrt(d0^2 + (theta*L)^2)" if config.use_initial_diameter else "basic theta(L)*L"
-    sigma_w_text = (
-        f"constant sigma_w = {config.sigma_w_value:.6f} m"
-        if config.sigma_w_mode == "constant"
-        else (
-            "linear sigma_w(L) = "
-            f"{config.sigma_w_value:.6f} + {config.sigma_w_slope:.6f} * L m"
-        )
-    )
+    sigma_w_text = f"linear sigma_w(L) = {config.sigma_w_value:.6f} + {config.sigma_w_slope:.6f} * L m"
 
     print("Laser rangefinder simulation summary")
     print(f"  config file: {config_path}")
     print(f"  distance grid: {config.L_min:.3f} .. {config.L_max:.3f} m with step {config.dL:.3f} m")
     print(f"  Monte Carlo: N = {config.N}, M = {config.M}, random_seed = {config.random_seed}")
-    print(f"  beam model: theta_0 = {config.theta_0:.6e} rad, spot model = {spot_model}")
+    print(f"  beam model: theta_0 = {config.theta_0:.6e} rad, spot model = theta(L)*L")
     print(f"  target: d_target = {config.d_target:.3f} m, R_t = {config.target_radius:.3f} m")
     print(
         "  signal model: "
@@ -168,7 +135,6 @@ def print_summary(
 
 
 def main() -> int:
-    """Run the simulation from the command line."""
     parser = build_parser()
     args = parser.parse_args()
 
@@ -178,7 +144,7 @@ def main() -> int:
         output_dir = create_run_output_dir(args.output_dir)
         artifacts = export_results(result, config, output_dir, save_plots=not args.no_plots)
         print_summary(config, args.config, output_dir, artifacts, result)
-    except Exception as exc:  # pragma: no cover - CLI guard
+    except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 

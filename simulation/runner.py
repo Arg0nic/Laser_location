@@ -14,8 +14,6 @@ from .utils import make_unique_path, save_json, write_csv_rows
 
 @dataclass(frozen=True)
 class SimulationResults:
-    """Simulation outputs on the configured distance grid."""
-
     distances: np.ndarray
     theta_values: np.ndarray
     sigma_w_values: np.ndarray
@@ -28,18 +26,12 @@ class SimulationResults:
 
 
 def run_simulation(config: SimulationConfig) -> SimulationResults:
-    """Execute the two-stage criterion on the distance grid."""
     rng = np.random.default_rng(config.random_seed)
     distances = np.arange(config.L_min, config.L_max + config.dL * 0.5, config.dL, dtype=float)
     distances = distances[distances <= config.L_max + 1.0e-12]
 
     theta_values = divergence_at_distance(distances, config.theta_0)
-    spot_diameters = spot_diameter(
-        distances,
-        config.theta_0,
-        use_initial_diameter=config.use_initial_diameter,
-        d0=config.d0,
-    )
+    spot_diameters = spot_diameter(distances, config.theta_0)
     spot_radii = spot_diameters / 2.0
     sigma_w_values = sigma_w_at_distance(distances, config)
     geometric_valid = spot_diameters <= config.d_target
@@ -79,7 +71,6 @@ def export_results(
     *,
     save_plots: bool = True,
 ) -> dict[str, Path]:
-    """Save CSV, used config, and plots for a completed simulation run."""
     artifacts: dict[str, Path] = {}
 
     csv_path = make_unique_path(output_dir / "results.csv")
@@ -119,7 +110,6 @@ def save_spot_diameter_plot(
     config: SimulationConfig,
     destination: Path,
 ) -> None:
-    """Save d(L) versus L."""
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.plot(results.distances, results.spot_diameters, color="#1f77b4", linewidth=2.0, label="d(L)")
     ax.axhline(
@@ -144,7 +134,6 @@ def save_success_probability_plot(
     config: SimulationConfig,
     destination: Path,
 ) -> None:
-    """Save p(L) versus L."""
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.plot(
         results.distances,

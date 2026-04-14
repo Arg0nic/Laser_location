@@ -11,7 +11,6 @@ def final_ewma_amplitudes(
     alpha: float,
     rng: np.random.Generator,
 ) -> np.ndarray:
-    """Simulate noisy pulse amplitudes and return the final EWMA output."""
     if ideal_amplitudes.size == 0:
         return np.empty(0, dtype=float)
 

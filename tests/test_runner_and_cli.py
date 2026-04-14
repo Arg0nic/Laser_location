@@ -29,8 +29,8 @@ class RunnerTests(unittest.TestCase):
             dL=50.0,
             N=10,
             M=3,
-            sigma_w_mode="constant",
             sigma_w_value=0.0,
+            sigma_w_slope=0.0,
             eta_min=0.0,
             A0=1.0,
             b=0.0,
@@ -56,7 +56,6 @@ class RunnerTests(unittest.TestCase):
             dL=50.0,
             N=30,
             M=4,
-            sigma_w_mode="linear",
             sigma_w_value=0.02,
             sigma_w_slope=0.0001,
             sigma_A=0.03,
@@ -76,8 +75,8 @@ class RunnerTests(unittest.TestCase):
             dL=50.0,
             N=5,
             M=2,
-            sigma_w_mode="constant",
             sigma_w_value=0.0,
+            sigma_w_slope=0.0,
             sigma_A=0.0,
             random_seed=123,
         )
@@ -116,13 +115,10 @@ class MainCliTests(unittest.TestCase):
             "sigma_A": 0.0,
             "T": 0.5,
             "alpha": 0.5,
-            "sigma_w_mode": "constant",
             "sigma_w_value": 0.0,
             "sigma_w_slope": 0.0,
             "p_required": 1.0,
             "random_seed": 123,
-            "use_initial_diameter": False,
-            "d0": 0.01,
         }
 
         with tempfile.TemporaryDirectory() as temp_dir:

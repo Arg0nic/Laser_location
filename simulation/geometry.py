@@ -11,7 +11,6 @@ TURBULENCE_MULTIPLIER: Final[float] = 3.0
 
 
 def divergence_at_distance(distance: float | np.ndarray, theta_0: float) -> float | np.ndarray:
-    """Compute theta(L) = theta_0 * 3^(floor(L / 200))."""
     distances = np.asarray(distance, dtype=float)
     bin_index = np.floor(distances / DISTANCE_BIN_M)
     values = theta_0 * np.power(TURBULENCE_MULTIPLIER, bin_index)
@@ -20,27 +19,15 @@ def divergence_at_distance(distance: float | np.ndarray, theta_0: float) -> floa
     return values
 
 
-def spot_diameter(
-    distance: float | np.ndarray,
-    theta_0: float,
-    *,
-    use_initial_diameter: bool = False,
-    d0: float = 0.0,
-) -> float | np.ndarray:
-    """Compute the laser spot diameter for the selected propagation model."""
+def spot_diameter(distance: float | np.ndarray, theta_0: float) -> float | np.ndarray:
     distances = np.asarray(distance, dtype=float)
-    geometric_component = divergence_at_distance(distances, theta_0) * distances
-    if use_initial_diameter:
-        values = np.sqrt(d0**2 + geometric_component**2)
-    else:
-        values = geometric_component
+    values = divergence_at_distance(distances, theta_0) * distances
     if np.isscalar(distance):
         return float(values)
     return values
 
 
 def circle_intersection_area(radius_a: float, radius_b: float, center_distance: float) -> float:
-    """Return the area of overlap between two circles."""
     if radius_a < 0 or radius_b < 0:
         raise ValueError("Circle radii must be non-negative.")
 
